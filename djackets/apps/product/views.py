@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import ProductSerializer
+from .serializers import CategorySerializer, ProductSerializer
 from .models import Product, Category
 
 class LatestProductsList(APIView):
@@ -19,15 +19,15 @@ class LatestProductsList(APIView):
 
 class ProductDetail(APIView):
 
-    def get_object(self, category_slug, product_slug):
-        try:
-            return Product.objects.filter(category__slug = category_slug).get(slug = product_slug)
-        except Product.DoesNotExist:
-            raise Http404
-
     def get(self, request, format = None, **kwargs):
-        print(kwargs)
-        # product = get_object_or_404(Product, slug=kwargs.get('product_slug'))
-        product = self.get_object(category_slug, product_slug)
+        product = get_object_or_404(Product, slug=kwargs.get('product_slug'))
         serializer = ProductSerializer(product)
+        return Response(serializer.data)
+
+
+class CategoryDetail(APIView):
+    
+    def get(self, request, format = None, **kwargs):
+        category = get_object_or_404(Category, slug = kwargs.get('category_slug'))
+        serializer = CategorySerializer(category)
         return Response(serializer.data)
